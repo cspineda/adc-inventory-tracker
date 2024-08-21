@@ -1,0 +1,4 @@
+pandas==2.2.2
+numpy==2.0.1
+prophet==1.1.5
+ShopifyAPI==12.6.0
