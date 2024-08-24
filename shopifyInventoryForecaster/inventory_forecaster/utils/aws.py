@@ -1,6 +1,6 @@
 import pandas as pd
 from io import StringIO
-from utils.logger import get_logger
+from .logger import get_logger
 
 
 logger = get_logger()

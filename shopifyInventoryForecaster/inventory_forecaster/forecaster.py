@@ -11,11 +11,11 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 from datetime import datetime, timedelta
 from prophet import Prophet
 
-from utils.queries import inventory_query, orders_query
-from utils.data import extract_inventory_total, generate_orders_table
-from utils.namespace import sku_mapper
-from utils.aws import save_df_to_s3, read_csv_from_s3
-from utils.logger import get_logger
+from .utils.queries import inventory_query, orders_query
+from .utils.data import extract_inventory_total, generate_orders_table
+from .utils.namespace import sku_mapper
+from .utils.aws import save_df_to_s3, read_csv_from_s3
+from .utils.logger import get_logger
 
 
 logger = get_logger()
@@ -56,6 +56,7 @@ start_date_filter = (today_dt - timedelta(days=1)).date().strftime('%Y-%m-%d')
 end_date_filter = todays_date.strftime('%Y-%m-%d')
 
 # Get orders data
+logger.info(f"Querying orders from {start_date_filter} to {end_date_filter}")
 orders_query = orders_query.replace('STARTDATE', start_date_filter).replace('ENDDATE', end_date_filter)
 orders_query_results = shopify.GraphQL().execute(orders_query)
 orders = json.loads(orders_query_results)
