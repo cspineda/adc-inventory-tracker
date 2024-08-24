@@ -2,6 +2,10 @@ import re
 import uuid
 import pandas as pd
 from datetime import datetime
+from utils.logger import get_logger
+
+
+logger = get_logger()
 
 
 def extract_inventory_total(query_results):
@@ -28,6 +32,7 @@ def create_partition():
 
 
 def extract_orders(query_results):
+    logger.info('Extracting orders')
     orders = query_results['data']['orders']['edges']
 
     cols = ['Row ID', 'Order ID', 'Order Number', 'Order Date', 'Order Timestamp', 'Product', 'SKU', 'Quantity']
@@ -41,7 +46,6 @@ def extract_orders(query_results):
         order_date = order['createdAt'].split('T')[0]
         line_items = order['lineItems']['edges']
 
-        order_info = []
         for line_item in line_items:
             product_name = line_item['node']['name']
             sku = line_item['node']['sku']
@@ -58,6 +62,18 @@ def extract_orders(query_results):
             )
 
     df['Partition Date'] = create_partition()
+    logger.info(f'Successfully extracted orders into a df.')
     return df
+
+
+def generate_orders_table(orders):
+    orders = extract_orders(orders)
+    orders.columns = [c.lower().replace(' ', '_') for c in orders.columns]
+    orders['order_date'] = pd.to_datetime(orders['order_date']).dt.date
+    orders['order_timestamp'] = pd.to_datetime(orders['order_timestamp'])
+    orders['sku'] = orders['sku'].apply(lambda x: x.rstrip('O') if isinstance(x, str) else x)
+    orders = remove_tiktok_shop_dups(orders)
+    orders.sort_values(['order_date', 'order_timestamp'], inplace=True)
+    return orders
 
 

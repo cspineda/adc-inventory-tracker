@@ -1,7 +1,3 @@
-import json
-import shopify
-
-
 inventory_query = """
 query {
     productVariants(first: 100){
@@ -21,7 +17,7 @@ query {
 # orders
 orders_query = """
 query {
-  orders(first: 250, query:"created_at:>='{start_date}T00:00:00Z' AND created_at:<'{end_date}T00:00:00Z'", reverse:false, sortKey: CREATED_AT) {
+  orders(first: 250, query:"created_at:>='STARTDATET00:00:00Z' AND created_at:<'ENDDATET00:00:00Z'", reverse:false, sortKey: CREATED_AT) {
     edges {
       node {
         id
@@ -44,9 +40,3 @@ query {
   }
 }
 """
-
-
-# execute a graphQL call
-def execute_query(query):
-    query_results = shopify.GraphQL().execute(query)
-    return json.loads(query_results)
